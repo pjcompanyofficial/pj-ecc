@@ -1,10 +1,11 @@
 /**
  * PJ-ECC CORE SYSTEM
  * Feature: QR Logo Integration & Holographic Watermark
+ * Updated Image: 1770956528605.png
  */
 
-// 1. CONFIGURATION FOR LOGO
-const LOGO_SRC = '1000041076.png'; // Place your image file in the same folder
+// 1. CONFIGURATION FOR LOGO (Updated with your file name)
+const LOGO_SRC = '1770956528605.png'; 
 
 // 2. STYLING THE HOLOGRAPHIC CARD WITH WATERMARK
 const injectWatermarkStyles = () => {
@@ -12,27 +13,28 @@ const injectWatermarkStyles = () => {
     style.innerHTML = `
         .verified-card {
             position: relative;
-            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f4f4f4 100%);
             overflow: hidden;
             z-index: 1;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* The Logo Watermark Background */
+        /* The Logo Watermark Background - Using 1770956528605.png */
         .verified-card::before {
             content: "";
             position: absolute;
-            top: 50%;
+            top: 55%; /* Slightly lower for better look */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             background-image: url('${LOGO_SRC}');
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
-            opacity: 0.15; /* Subtle watermark effect */
+            opacity: 0.12; /* Subtle watermark opacity */
             z-index: -1;
-            filter: grayscale(100%);
+            filter: grayscale(100%); /* Professional subtle look */
         }
 
         /* Animated Holographic Overlay */
@@ -46,50 +48,53 @@ const injectWatermarkStyles = () => {
             background: linear-gradient(
                 45deg,
                 rgba(255,255,255,0) 0%,
-                rgba(255,255,255,0.1) 45%,
-                rgba(255,255,255,0.5) 50%,
-                rgba(255,255,255,0.1) 55%,
+                rgba(255,255,255,0.05) 45%,
+                rgba(255,255,255,0.4) 50%,
+                rgba(255,255,255,0.05) 55%,
                 rgba(255,255,255,0) 100%
             );
             transform: rotate(25deg);
-            animation: holo-shine 6s infinite;
+            animation: holo-shine 5s infinite linear;
             pointer-events: none;
         }
 
         @keyframes holo-shine {
-            0% { transform: translate(-10%, -10%) rotate(25deg); }
-            100% { transform: translate(10%, 10%) rotate(25deg); }
+            0% { transform: translate(-15%, -15%) rotate(25deg); }
+            100% { transform: translate(15%, 15%) rotate(25deg); }
         }
 
         #qrcode {
             position: relative;
             display: inline-block;
-            padding: 10px;
+            padding: 12px;
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Center Logo Styling for QR */
+        /* Center Logo Circle for QR Code - Using 1770956528605.png */
         .qr-logo-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50px; /* Adjust size of center logo */
-            height: 50px;
+            width: 60px; /* Perfect size for readability */
+            height: 60px;
             background: white;
-            border-radius: 50%; /* Circle shape as requested */
+            border-radius: 50%; 
             padding: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid #fff;
         }
 
         .qr-logo-overlay img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            border-radius: 50%;
         }
     `;
     document.head.appendChild(style);
@@ -102,25 +107,25 @@ function generateSecureQR() {
     const a = document.getElementById('mAddr').value;
     const r = document.getElementById('mRef').value;
     
-    if(!n || !r) return alert("All fields are mandatory!");
+    if(!n || !r) return alert("Please fill Name and Ref ID!");
 
     const qrd = document.getElementById('qrcode');
-    qrd.innerHTML = ""; // Clear old QR
+    qrd.innerHTML = ""; 
     document.getElementById('qr-display-section').classList.remove('hidden');
 
     const link = `${window.location.origin}${window.location.pathname}?pjecc=1&n=${encodeURIComponent(n)}&d=${encodeURIComponent(d)}&a=${encodeURIComponent(a)}&r=${encodeURIComponent(r)}`;
     
-    // Create QR Code
+    // Create QR Code with High Correction level for Logo
     new QRCode(qrd, {
         text: link,
         width: 256,
         height: 256,
         colorDark : "#000000",
         colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H // High level allows for logo overlay
+        correctLevel : QRCode.CorrectLevel.H 
     });
 
-    // Wait a moment for QR to render, then add center logo
+    // Add 1770956528605.png as center logo overlay
     setTimeout(() => {
         const qrContainer = document.getElementById('qrcode');
         const logoOverlay = document.createElement('div');
@@ -131,9 +136,8 @@ function generateSecureQR() {
         
         logoOverlay.appendChild(logoImg);
         qrContainer.appendChild(logoOverlay);
-    }, 100);
+    }, 150);
 }
 
-// Initialize styles
+// Initialize
 injectWatermarkStyles();
-
