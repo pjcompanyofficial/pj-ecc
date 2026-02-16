@@ -1,184 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PJ-ECC | Secure System</title>
-    
-    <script src="security-engine.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta charset="UTF-8">
+<title>Secure Cyber Scan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        :root { --pj-orange: #FF6A00; --pj-red: #FF3131; --bg-dark: #050505; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg-dark); color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+<style>
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: orange;
+  overflow: hidden;
+}
+.light {
+  background: #f5f5f5;
+  color: #111;
+}
 
-        /* Glowing & Hover Effects */
-        .input-field:focus { border-color: var(--pj-orange) !important; box-shadow: 0 0 15px var(--pj-orange); outline: none; }
-        .btn-primary { 
-            background: linear-gradient(45deg, var(--pj-orange), var(--pj-red)); 
-            border: none; color: white; cursor: pointer; font-weight: 900; transition: 0.3s;
-        }
-        .btn-primary:hover { box-shadow: 0 0 20px var(--pj-orange); transform: scale(1.02); }
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  align-items: center;
+}
+#menuBtn {
+  font-size: 26px;
+  cursor: pointer;
+}
 
-        .container { background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(255,106,0,0.2); border-radius: 40px; padding: 25px; width: 90%; max-width: 400px; text-align: center; position: relative; }
-        .input-field { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; background: #000; border: 1px solid #333; color: #fff; box-sizing: border-box; }
-        
-        /* Three-Dot Menu */
-        .menu-btn { position: absolute; top: 25px; right: 25px; font-size: 24px; color: var(--pj-orange); cursor: pointer; }
-        .menu-content { position: absolute; top: 60px; right: 20px; background: #111; border: 1px solid var(--pj-orange); border-radius: 10px; display: none; width: 140px; text-align: left; z-index: 100; }
-        .menu-content div { padding: 10px; font-size: 0.8em; border-bottom: 1px solid #222; cursor: pointer; }
+/* ===== MENU ===== */
+#menuPanel {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: #111;
+  border-radius: 10px;
+  padding: 10px;
+  display: none;
+}
+#menuPanel button {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+}
 
-        /* Card Style */
-        .luxury-card { background: rgba(255,255,255,0.03); border-radius: 30px; margin-top: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .profile-frame { width: 100px; height: 100px; margin: 0 auto 15px; border-radius: 20%; background: linear-gradient(135deg, var(--pj-orange), var(--pj-red)); padding: 4px; }
-        .profile-img { width: 100%; height: 100%; object-fit: cover; border-radius: 15%; }
-        .data-row { display: flex; justify-content: space-between; font-size: 0.75em; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px; text-align: left; }
-        
-        .hidden { display: none !important; }
-    </style>
+/* ===== BUTTON ===== */
+button {
+  background: linear-gradient(45deg, orange, red);
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 0 20px orange;
+  transition: 0.3s;
+}
+button:hover {
+  box-shadow: 0 0 40px red;
+}
+
+/* ===== SCANNER ===== */
+#scanner {
+  display: flex;
+  justify-content: center;
+  margin-top: 100px;
+}
+
+/* ===== CYBER GRID ===== */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+/* ===== BUBBLES ===== */
+.bubble {
+  position: absolute;
+  bottom: -20px;
+  width: 6px;
+  height: 6px;
+  background: orange;
+  border-radius: 50%;
+  animation: bubble 6s linear infinite;
+}
+@keyframes bubble {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-120vh); opacity: 0; }
+}
+</style>
 </head>
-<body>
 
-    <div class="container" id="main-app">
-        <div class="menu-btn" onclick="toggleMenu()">⋮</div>
-        <div class="menu-content" id="dropdown">
-            <div onclick="isMuted = !isMuted; toggleMenu();">MUTE/UNMUTE</div>
-            <div onclick="location.reload()">REFRESH</div>
-        </div>
+<body class="dark cyber">
 
-        <div id="view-home">
-            <h1 style="font-family:'Orbitron'; color:var(--pj-orange); margin-bottom:30px;">PJ-ECC</h1>
-            <button onclick="switchView('view-scanner'); startScanning();" class="btn-primary" style="width:100%; height:55px; border-radius:15px; font-size:1em;">SCAN TOKEN</button>
-            <button onclick="switchView('view-login')" style="background:none; border:none; color:#555; margin-top:20px; cursor:pointer;">ADMIN ACCESS</button>
-        </div>
+<header>
+  <h2>SECURE SCAN</h2>
+  <div id="menuBtn">⋮</div>
+</header>
 
-        <div id="view-login" class="hidden">
-            <h2 style="font-family:'Orbitron'; font-size:1em;">SECURE LOGIN</h2>
-            <input type="password" id="adminPass" class="input-field" placeholder="ENTER KEY">
-            <button onclick="if(document.getElementById('adminPass').value==='sonu@jeet') switchView('view-admin');" class="btn-primary" style="width:100%; height:45px; border-radius:10px;">LOGIN</button>
-        </div>
+<div id="menuPanel">
+  <button onclick="toggleMute()">Mute</button>
+  <button onclick="toggleTheme()">Light / Dark</button>
+  <button onclick="toggleCyber()">Cyber Mode</button>
+</div>
 
-        <div id="view-admin" class="hidden">
-            <h3 style="font-size:0.9em; color:var(--pj-orange);">NEW EMPLOYEE</h3>
-            <input type="text" id="mName" class="input-field" placeholder="EMPLOYEE NAME">
-            <input type="date" id="mJoin" class="input-field" title="JOINING DATE">
-            <select id="mGender" class="input-field" style="color:#aaa;">
-                <option value="" disabled selected>SELECT GENDER</option>
-                <option value="MALE">MALE</option>
-                <option value="FEMALE">FEMALE</option>
-                <option value="OTHER">OTHER</option>
-            </select>
-            <input type="text" id="mAddr" class="input-field" placeholder="ADDRESS">
-            <input type="text" id="mRef" class="input-field" placeholder="INTERNAL REFERENCE NO.">
-            
-            <button onclick="document.getElementById('mPhoto').click()" class="input-field" style="background:#222; border-style:dashed;">UPLOAD PHOTO</button>
-            <input type="file" id="mPhoto" class="hidden" onchange="processPhoto(event)">
-            
-            <button onclick="generateToken()" class="btn-primary" style="width:100%; height:50px; border-radius:12px; margin-top:10px;">GENERATE QR</button>
-            
-            <div id="qr-area" class="hidden" style="margin-top:15px;">
-                <div id="qr-wrap" style="background:#fff; padding:10px; border-radius:15px; display:inline-block;"><div id="qrcode"></div></div>
-                <button onclick="saveToken()" class="btn-primary" style="width:100%; height:40px; margin-top:10px; border-radius:10px;">SAVE QR</button>
-            </div>
-            <button onclick="location.reload()" style="background:none; border:none; color:white; margin-top:10px;">BACK</button>
-        </div>
+<canvas id="grid"></canvas>
 
-        <div id="view-card" class="hidden">
-            <div class="luxury-card">
-                <div class="profile-frame"><img id="resPhoto" class="profile-img"></div>
-                <div class="data-row"><span>NAME</span><b id="resName" style="color:var(--pj-orange);"></b></div>
-                <div class="data-row"><span>JOINED</span><span id="resJoin"></span></div>
-                <div class="data-row"><span>GENDER</span><span id="resGender"></span></div>
-                <div class="data-row"><span>REF NO.</span><span id="resRef"></span></div>
-                <div class="data-row" style="border:none;"><span>ADDRESS</span><span id="resAddr"></span></div>
-            </div>
-            <button onclick="location.reload()" class="btn-primary" style="width:100%; height:50px; border-radius:15px; margin-top:20px;">DONE</button>
-        </div>
+<div id="scanner">
+  <button onclick="scanToken()">SCAN TOKEN</button>
+</div>
 
-        <div id="view-scanner" class="hidden">
-            <div id="reader" style="width:100%; border-radius:20px; overflow:hidden;"></div>
-            <button onclick="location.reload()" class="btn-primary" style="width:100%; height:45px; margin-top:15px; background:#333;">CANCEL</button>
-        </div>
-    </div>
+<audio id="beep">
+  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=">
+</audio>
 
-    <script>
-        let adminPhoto = "", isMuted = false;
+<script>
+/* ===== STATE ===== */
+let muted = false;
+let cyberOn = true;
 
-        function toggleMenu() { let m = document.getElementById('dropdown'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-        function switchView(id) { document.querySelectorAll('.container > div').forEach(v => v.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+/* ===== MENU ===== */
+menuBtn.onclick = () => {
+  menuPanel.style.display =
+    menuPanel.style.display === "block" ? "none" : "block";
+};
 
-        function playBeep() {
-            if(isMuted) return;
-            let ctx = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = ctx.createOscillator();
-            let gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.frequency.value = 900; gain.gain.value = 0.1;
-            osc.start(); osc.stop(ctx.currentTime + 0.1);
-        }
+function toggleMute() {
+  muted = !muted;
+}
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+function toggleCyber() {
+  cyberOn = !cyberOn;
+  grid.style.display = cyberOn ? "block" : "none";
+}
 
-        function processPhoto(e) {
-            let reader = new FileReader();
-            reader.onload = (ev) => {
-                let img = new Image();
-                img.src = ev.target.result;
-                img.onload = () => {
-                    let cvs = document.createElement('canvas');
-                    cvs.width = 100; cvs.height = 100;
-                    cvs.getContext('2d').drawImage(img,0,0,100,100);
-                    adminPhoto = cvs.toDataURL('image/jpeg', 0.6);
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
+/* ===== DEVICE FINGERPRINT (CLIENT LEVEL) ===== */
+function fingerprint() {
+  return btoa(
+    navigator.userAgent +
+    screen.width +
+    screen.height +
+    navigator.language
+  );
+}
 
-        function generateToken() {
-            let data = {
-                n: document.getElementById('mName').value,
-                j: document.getElementById('mJoin').value,
-                g: document.getElementById('mGender').value,
-                a: document.getElementById('mAddr').value,
-                r: document.getElementById('mRef').value,
-                img: adminPhoto
-            };
-            if(!data.n || !adminPhoto) return alert("Missing Info");
-            let enc = "SEC|" + btoa(JSON.stringify(data)).split('').reverse().join('');
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById('qrcode'), { text: enc, width: 160, height: 160 });
-            document.getElementById('qr-area').classList.remove('hidden');
-        }
+/* ===== TOKEN SCAN + EXPIRY LOGIC ===== */
+function scanToken() {
+  if (!muted) beep.play();
 
-        async function startScanning() {
-            let scanner = new Html5Qrcode("reader");
-            scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (txt) => {
-                scanner.stop().then(() => {
-                    try {
-                        let raw = atob(txt.split("SEC|")[1].split('').reverse().join(''));
-                        let user = JSON.parse(raw);
-                        playBeep();
-                        switchView('view-card');
-                        document.getElementById('resName').innerText = user.n;
-                        document.getElementById('resJoin').innerText = user.j;
-                        document.getElementById('resGender').innerText = user.g;
-                        document.getElementById('resRef').innerText = user.r;
-                        document.getElementById('resAddr').innerText = user.a;
-                        document.getElementById('resPhoto').src = user.img;
-                        if(!isMuted) { let s = new SpeechSynthesisUtterance("Welcome " + user.n); window.speechSynthesis.speak(s); }
-                    } catch(e) { alert("Invalid Token"); location.reload(); }
-                });
-            });
-        }
+  const raw = prompt("Paste Token JSON:");
+  if (!raw) return;
 
-        function saveToken() {
-            html2canvas(document.getElementById('qr-wrap')).then(c => {
-                let a = document.createElement('a'); a.download = 'TOKEN.png'; a.href = c.toDataURL(); a.click();
-            });
-        }
-        
-        // SECURITY REMOVED: No more window.onblur or shield-overlay logic.
-    </script>
+  let token;
+  try {
+    token = JSON.parse(raw);
+  } catch {
+    alert("INVALID TOKEN FORMAT");
+    return;
+  }
+
+  if (token.expiry !== "NONE" && Date.now() > token.expiry) {
+    alert("❌ EXPIRED");
+    return;
+  }
+
+  if (token.fp && token.fp !== fingerprint()) {
+    alert("❌ DEVICE MISMATCH");
+    return;
+  }
+
+  alert("✅ ACCESS GRANTED");
+}
+
+/* ===== CYBER GRID ANIMATION ===== */
+const ctx = grid.getContext("2d");
+function drawGrid() {
+  grid.width = innerWidth;
+  grid.height = innerHeight;
+  ctx.clearRect(0,0,grid.width,grid.height);
+  ctx.strokeStyle = "rgba(255,140,0,0.15)";
+  for (let x=0;x<grid.width;x+=40){
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,grid.height);ctx.stroke();
+  }
+  for (let y=0;y<grid.height;y+=40){
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(grid.width,y);ctx.stroke();
+  }
+}
+setInterval(drawGrid, 1200);
+
+/* ===== BUBBLE FIX (NOT REMOVED) ===== */
+setInterval(()=>{
+  if(!cyberOn) return;
+  const b=document.createElement("div");
+  b.className="bubble";
+  b.style.left=Math.random()*100+"vw";
+  document.body.appendChild(b);
+  setTimeout(()=>b.remove(),6000);
+},600);
+</script>
+
 </body>
 </html>
